@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Claim Your Certificate{% endblock %}
+
+{% block content %}
+<div class="certificate-claim-container">
+  <div class="certificate-decoration"></div>
+
+  <div class="certificate-header">
+    <h1 class="certificate-title">Claim Your IQ Certificate</h1>
+    <p class="certificate-subtitle">
+      You're just one step away from receiving your official IQ test certificate
+      <span class="session-badge">Session #{{ test_session.id }}</span>
+    </p>
+  </div>
+
+  <form method="post" action="{% url 'generate_certificate' session_id=test_session.id %}" class="certificate-form">
+    {% csrf_token %}
+    <div class="form-floating">
+      <label for="certificate_name">Name on Certificate</label>
+      <input type="text" id="certificate_name" name="certificate_name" required 
+             placeholder="Enter your full name" oninput="updatePreview()" autocomplete="name">
+      <span class="name-instructions">This name will appear exactly as entered on your certificate</span>
+    </div>
+    
+    <button type="submit" class="generate-btn">
+      <i class="fas fa-award"></i> Generate My Certificate
+    </button>
+  </form>
+
+  <div class="preview-section">
+    <h3 class="preview-header">Live Certificate Preview</h3>
+    <div class="canvas-container">
+      <canvas id="previewCanvas" width="800" height="600"></canvas>
+    </div>
+    
+    <div class="certificate-tips">
+      <div class="tips-title">
+        <i class="fas fa-lightbulb"></i> Certificate Tips
+      </div>
+      <ul class="tips-list">
+        <li>Use your full legal name for official recognition</li>
+        <li>Double-check spelling before submission</li>
+        <li>Your certificate will be available to download as a high-quality PDF</li>
+        <li>You can share your certificate on LinkedIn and other platforms</li>
+      </ul>
+    </div>
+    
+    <p class="certificate-note">
+      Your certificate will include your IQ score, percentile, and date of completion
+    </p>
+  </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('previewCanvas');
+    const ctx = canvas.getContext('2d');
+    const templateImage = new Image();
+    templateImage.src = "{% static 'images/IQforge certificate.png' %}";  // Path to your template image
+
+    templateImage.onload = function() {
+        updatePreview();
+        // Make canvas responsive
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+    };
+
+    function resizeCanvas() {
+        const container = document.querySelector('.canvas-container');
+        const containerWidth = container.clientWidth;
+        const scaleFactor = containerWidth / canvas.width;
+        
+        // Set the canvas display size (not the actual dimensions)
+        canvas.style.width = '100%';
+        canvas.style.height = 'auto';
+    }
+
+    function updatePreview() {
+        const name = document.getElementById('certificate_name').value.toUpperCase();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(templateImage, 0, 0, canvas.width, canvas.height);
+
+        // Add a subtle shine effect
+        const gradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+        gradient.addColorStop(0, 'rgba(255,255,255,0)');
+        gradient.addColorStop(0.4, 'rgba(255,255,255,0.1)');
+        gradient.addColorStop(0.6, 'rgba(255,255,255,0.1)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Set initial font properties
+        let fontSize = 36;          // Starting font size (increased for better visibility)
+        const maxWidth = 600;       // Maximum width for the name area
+        const minFontSize = 20;     // Minimum font size to prevent text from being too small
+        ctx.fillStyle = '#1a202c';  // Dark color for better readability
+        ctx.textAlign = 'center';
+
+        // Adjust font size based on name length
+        ctx.font = `bold ${fontSize}px "Times New Roman", serif`;
+        let textWidth = ctx.measureText(name).width;
+        while (textWidth > maxWidth && fontSize > minFontSize) {
+            fontSize -= 2;  // Reduce font size in smaller increments for better control
+            ctx.font = `bold ${fontSize}px "Times New Roman", serif`;
+            textWidth = ctx.measureText(name).width;
+        }
+
+        // Draw the name with the adjusted font size
+        const nameX = canvas.width / 2;  // Center horizontally
+        const nameY = 225;               // Y-coordinate (adjust to match your template)
+        
+        // Add slight shadow for depth
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 2;
+        ctx.shadowOffsetX = 1;
+        ctx.shadowOffsetY = 1;
+        ctx.fillText(name, nameX, nameY);
+        
+        // Reset shadow
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 0;
+    }
+</script>
+{% endblock %}

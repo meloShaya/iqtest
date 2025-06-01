@@ -1,0 +1,41 @@
+{% load quiz_filters %}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Question List</title>
+</head>
+<body>
+    <h2>All Questions</h2>
+    <ul>
+        {% for question in questions %}
+            <li>
+                {% if question.image %}
+                    <img src="{{ question.image.url }}" alt="Question Image" style="max-width: 200px;"><br>
+                {% endif %}
+                <strong>Text:</strong> {{ question.text }}<br>
+                <strong>Options:</strong>
+                <ul>
+                    {% for key, value in question.options.items %}
+                        <li>
+                            {{ key }}:
+                            {% with option_image=question.option_images|get_option_image:key %}
+                                {% if option_image %}
+                                    <img src="{{ option_image.image.url }}" alt="Option {{ key }}" style="max-width: 100px;">
+                                {% else %}
+                                    {{ value }}
+                                {% endif %}
+                            {% endwith %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
+
+
+

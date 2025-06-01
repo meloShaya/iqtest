@@ -1,0 +1,49 @@
+{% extends "base.html" %} {% load static %} {% block title %}Simple Paynow
+Test{% endblock %} {% block content %}
+<div class="container mt-5">
+	<div class="row">
+		<div class="col-md-12">
+			<div class="card">
+				<div class="card-header bg-primary text-white">
+					<h3 class="mb-0">Simple Paynow Test</h3>
+				</div>
+				<div class="card-body">
+					<form method="post">
+						{% csrf_token %}
+						<div class="mb-3">
+							<label for="phone_number" class="form-label"
+								>Phone Number</label
+							>
+							<input
+								type="text"
+								class="form-control"
+								id="phone_number"
+								name="phone_number"
+								required
+							/>
+							<small class="form-text text-muted"
+								>Enter a phone number (e.g., 07XXXXXXXX)</small
+							>
+						</div>
+						<button type="submit" class="btn btn-primary">
+							Test Paynow
+						</button>
+					</form>
+
+					{% if result %}
+					<div class="mt-4">
+						<h4>Test Results:</h4>
+						<pre
+							class="bg-light p-3 mt-2"
+							style="max-height: 500px; overflow-y: auto"
+						>
+{{ result }}</pre
+						>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

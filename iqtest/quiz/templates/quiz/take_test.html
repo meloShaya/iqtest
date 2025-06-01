@@ -1,0 +1,619 @@
+{% extends 'base.html' %} {% load static %} {% block content %}
+<div class="container-fluid h-100" style="background-color: #121212">
+	<div class="row h-100">
+		<!-- Question Area -->
+		<div
+			class="col-md-8 d-flex align-items-center justify-content-center"
+			style="min-height: 80vh"
+		>
+			<div
+				id="question-area"
+				class="text-center p-4 rounded"
+				style="
+					background-color: #1e1e1e;
+					width: 90%;
+					box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+				"
+			>
+				<h2
+					id="question-text"
+					class="mb-4 fw-bold"
+					style="color: #fff; font-size: 2rem"
+				></h2>
+				<div class="image-container mb-4">
+					<img
+						id="question-image"
+						class="img-fluid rounded"
+						style="max-height: 400px; display: none; margin: 0 auto"
+					/>
+				</div>
+			</div>
+		</div>
+
+		<!-- Options Area -->
+		<div class="col-md-4 p-4" style="background-color: #1e1e1e">
+			<div
+				class="p-4 rounded"
+				style="
+					background-color: #292929;
+					box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+				"
+			>
+				<h3
+					class="mb-4 text-center"
+					style="color: #ffffff; font-weight: 600"
+				>
+					Choose your answer
+				</h3>
+				<form id="answer-form">
+					{% csrf_token %}
+					<div id="options-container" class="row g-3 mb-4"></div>
+					<button
+						type="submit"
+						id="submit-btn"
+						class="btn w-100 py-3 fw-bold rounded-pill"
+						style="
+							background-color: #4d5eff;
+							color: white;
+							font-size: 1.1rem;
+							transition: all 0.3s;
+						"
+					>
+						Next
+					</button>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- Navigation and Timer -->
+	<div
+		class="row p-3"
+		style="
+			background-color: #1e1e1e;
+			box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
+		"
+	>
+		<div class="col-md-3 col-6">
+			<button
+				id="prev-btn"
+				class="btn py-2 px-3 rounded-pill"
+				style="background-color: #333; color: white; border: none"
+			>
+				<i class="fas fa-chevron-left me-2"></i> Previous
+			</button>
+		</div>
+		<div
+			class="col-md-6 col-12 text-center d-flex align-items-center justify-content-center py-2"
+		>
+			<div
+				class="progress w-50 me-3"
+				style="height: 8px; background-color: #333"
+			>
+				<div
+					id="progress-bar"
+					class="progress-bar"
+					style="background-color: #4d5eff; width: 0%"
+				></div>
+			</div>
+			<span id="progress" style="color: #ddd; font-weight: 500"></span>
+			<span class="mx-2" style="color: #666">|</span>
+			<span id="timer" style="color: #ff7b7b; font-weight: 600"
+				>20:00</span
+			>
+		</div>
+		<div class="col-md-3 col-6 text-end">
+			<button
+				id="skip-btn"
+				class="btn py-2 px-3 rounded-pill"
+				style="background-color: #454545; color: white; border: none"
+			>
+				Skip <i class="fas fa-forward ms-2"></i>
+			</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	let currentIndex = 0;
+	let totalQuestions = parseInt("{{ total_questions|safe }}") || 10; // Total questions with fallback
+	let timeRemaining = 1200; // 20 minutes in seconds
+	let sessionId = "{{ session_id }}";
+	let timer;
+	let isSubmitting = false; // Flag to prevent multiple submissions
+	let isPaused = false; // Flag to track if timer is paused
+
+	function updateTimer() {
+		// Don't decrement time if paused
+		if (isPaused) return;
+
+		const minutes = Math.floor(timeRemaining / 60);
+		const seconds = timeRemaining % 60;
+		document.getElementById("timer").textContent = `${minutes}:${
+			seconds < 10 ? "0" : ""
+		}${seconds}`;
+
+		// Change timer color based on time remaining
+		if (timeRemaining < 60) {
+			// Less than 1 minute
+			document.getElementById("timer").style.color = "#ff4444";
+		} else if (timeRemaining < 300) {
+			// Less than 5 minutes
+			document.getElementById("timer").style.color = "#ffaa44";
+		}
+
+		if (timeRemaining <= 0) {
+			clearInterval(timer);
+			alert("Time is up!");
+			// Show review dialog before redirecting
+			showReviewDialog();
+			return;
+		}
+		timeRemaining--;
+	}
+
+	function updateProgressBar() {
+		const progressPercent = ((currentIndex + 1) / totalQuestions) * 100;
+		document.getElementById(
+			"progress-bar"
+		).style.width = `${progressPercent}%`;
+	}
+
+	// Initialize answer tracking object
+	const userAnswers = {};
+
+	// Create a function to display the review dialog
+	function showReviewDialog() {
+		// Pause the timer when dialog is shown
+		isPaused = true;
+
+		// Create modal backdrop
+		const backdrop = document.createElement("div");
+		backdrop.id = "review-dialog-backdrop";
+		backdrop.className = "modal-backdrop";
+		backdrop.style.position = "fixed";
+		backdrop.style.top = "0";
+		backdrop.style.left = "0";
+		backdrop.style.width = "100%";
+		backdrop.style.height = "100%";
+		backdrop.style.backgroundColor = "rgba(0,0,0,0.7)";
+		backdrop.style.zIndex = "1000";
+		backdrop.style.display = "flex";
+		backdrop.style.justifyContent = "center";
+		backdrop.style.alignItems = "center";
+
+		// Create modal content
+		const dialog = document.createElement("div");
+		dialog.className = "review-dialog";
+		dialog.style.backgroundColor = "#1e1e1e";
+		dialog.style.borderRadius = "8px";
+		dialog.style.boxShadow = "0 4px 20px rgba(0,0,0,0.5)";
+		dialog.style.width = "80%";
+		dialog.style.maxWidth = "700px";
+		dialog.style.maxHeight = "80vh";
+		dialog.style.overflowY = "auto";
+		dialog.style.padding = "24px";
+		dialog.style.color = "#fff";
+
+		// Create header
+		const header = document.createElement("div");
+		header.style.display = "flex";
+		header.style.justifyContent = "space-between";
+		header.style.alignItems = "center";
+		header.style.marginBottom = "20px";
+
+		const title = document.createElement("h3");
+		title.textContent = "Quiz Choices";
+		title.style.margin = "0";
+		title.style.color = "#fff";
+		title.style.fontWeight = "600";
+
+		const closeBtn = document.createElement("button");
+		closeBtn.innerHTML = "&times;";
+		closeBtn.style.backgroundColor = "transparent";
+		closeBtn.style.border = "none";
+		closeBtn.style.color = "#fff";
+		closeBtn.style.fontSize = "24px";
+		closeBtn.style.cursor = "pointer";
+		closeBtn.onclick = function () {
+			// Only allow closing if time remains
+			if (timeRemaining > 0) {
+				// Resume timer when closing
+				isPaused = false;
+				document.body.removeChild(backdrop);
+			}
+		};
+
+		header.appendChild(title);
+		header.appendChild(closeBtn);
+		dialog.appendChild(header);
+
+		// Create summary
+		const summary = document.createElement("div");
+		summary.style.marginBottom = "20px";
+		summary.style.padding = "10px";
+		summary.style.backgroundColor = "#292929";
+		summary.style.borderRadius = "6px";
+
+		// Show appropriate message based on time remaining
+		const summaryText = document.createElement("p");
+		if (timeRemaining > 0) {
+			summaryText.textContent =
+				"Summary of your test answers - You can still make changes";
+		} else {
+			summaryText.textContent =
+				"Summary of your test answers - Time's up!";
+		}
+		summaryText.style.color = "#aaa";
+		summaryText.style.margin = "0";
+
+		summary.appendChild(summaryText);
+		dialog.appendChild(summary);
+
+		// Create table
+		const table = document.createElement("div");
+		table.style.width = "100%";
+
+		// Create table header
+		const tableHeader = document.createElement("div");
+		tableHeader.style.display = "flex";
+		tableHeader.style.borderBottom = "1px solid #333";
+		tableHeader.style.paddingBottom = "10px";
+		tableHeader.style.marginBottom = "10px";
+
+		const questionHeader = document.createElement("div");
+		questionHeader.textContent = "Question";
+		questionHeader.style.flex = "1";
+		questionHeader.style.fontWeight = "500";
+
+		const statusHeader = document.createElement("div");
+		statusHeader.textContent = "Your Answer";
+		statusHeader.style.flex = "2";
+		statusHeader.style.fontWeight = "500";
+
+		tableHeader.appendChild(questionHeader);
+		tableHeader.appendChild(statusHeader);
+		table.appendChild(tableHeader);
+
+		// Add answers to table
+		for (let i = 1; i <= totalQuestions; i++) {
+			const answer = userAnswers[i] || null;
+
+			const row = document.createElement("div");
+			row.style.display = "flex";
+			row.style.borderBottom = "1px solid #333";
+			row.style.padding = "10px 0";
+
+			const questionCell = document.createElement("div");
+			questionCell.textContent = `Question ${i}`;
+			questionCell.style.flex = "1";
+			questionCell.style.color = "#ff7b7b";
+
+			const answerCell = document.createElement("div");
+			answerCell.textContent = answer || "Skipped";
+			answerCell.style.flex = "2";
+			answerCell.style.color = answer ? "#fff" : "#aaa";
+
+			row.appendChild(questionCell);
+			row.appendChild(answerCell);
+			table.appendChild(row);
+		}
+
+		dialog.appendChild(table);
+
+		// Create buttons
+		const buttonContainer = document.createElement("div");
+		buttonContainer.style.marginTop = "24px";
+		buttonContainer.style.display = "flex";
+		buttonContainer.style.justifyContent = "center";
+		buttonContainer.style.gap = "12px";
+
+		// Only add "Return to test" if time remains
+		if (timeRemaining > 0) {
+			const returnBtn = document.createElement("button");
+			returnBtn.textContent = "Return to test";
+			returnBtn.className = "btn";
+			returnBtn.style.backgroundColor = "#4d5eff";
+			returnBtn.style.color = "white";
+			returnBtn.style.border = "none";
+			returnBtn.style.borderRadius = "50px";
+			returnBtn.style.padding = "10px 20px";
+			returnBtn.style.cursor = "pointer";
+			returnBtn.onclick = () => {
+				// Resume timer when returning to test
+				isPaused = false;
+				document.body.removeChild(backdrop);
+			};
+
+			buttonContainer.appendChild(returnBtn);
+		}
+
+		const submitBtn = document.createElement("button");
+		submitBtn.textContent = "Submit all and finish";
+		submitBtn.className = "btn";
+		submitBtn.style.backgroundColor = "#ff7b7b";
+		submitBtn.style.color = "white";
+		submitBtn.style.border = "none";
+		submitBtn.style.borderRadius = "50px";
+		submitBtn.style.padding = "10px 20px";
+		submitBtn.style.cursor = "pointer";
+		submitBtn.onclick = () => {
+			window.location.href =
+				"{% url 'payment:process' session_id=session_id %}";
+			// window.location.href =
+			// 	"{% url 'share_to_view' session_id=session_id %}";
+		};
+
+		buttonContainer.appendChild(submitBtn);
+		dialog.appendChild(buttonContainer);
+
+		// Add dialog to document
+		backdrop.appendChild(dialog);
+		document.body.appendChild(backdrop);
+	}
+
+	// Improved fetchQuestion function to handle submissions properly
+	function fetchQuestion(index, submitAnswer = false) {
+		// Prevent multiple submissions
+		if (isSubmitting)
+			return Promise.reject(new Error("Submission in progress"));
+
+		isSubmitting = true;
+
+		// Show loading state
+		const submitBtn = document.getElementById("submit-btn");
+		submitBtn.innerHTML =
+			'<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Loading...';
+		submitBtn.disabled = true;
+
+		const formData = new FormData(document.getElementById("answer-form"));
+		formData.append("session_id", sessionId);
+		formData.append("current_index", index);
+
+		// Add answer data if submitting an answer
+		if (submitAnswer) {
+			let answerValue = ""; // Default to empty string for skipped answers
+			const selectedRadio = document.querySelector(
+				'input[name="answer"]:checked'
+			);
+			if (selectedRadio) {
+				answerValue = selectedRadio.value;
+			} else {
+				const textAnswer = document.getElementById("text-answer");
+				if (textAnswer) {
+					answerValue = textAnswer.value.trim();
+					textAnswer.value = ""; // Clear input after submission
+				}
+			}
+
+			// Only submit and update if:
+			// 1. The answer is not empty (user selected something) OR
+			// 2. We don't have an existing answer for this question (it's new)
+			const existingAnswer = userAnswers[index + 1];
+			const shouldUpdate = answerValue !== "" || !existingAnswer;
+
+			if (shouldUpdate) {
+				// Always submit an answer, even if empty
+				formData.append("answer", answerValue);
+				formData.append(
+					"question_id",
+					document.getElementById("question-area").dataset
+						.questionId || ""
+				);
+
+				// Store the answer in userAnswers
+				userAnswers[index + 1] = answerValue;
+			} else {
+				// If we already have an answer and the new answer is empty,
+				// use the existing answer
+				formData.append("answer", existingAnswer);
+				formData.append(
+					"question_id",
+					document.getElementById("question-area").dataset
+						.questionId || ""
+				);
+			}
+		}
+
+		return fetch('{% url "get_question" %}', {
+			method: "POST",
+			body: formData,
+			headers: { "X-CSRFToken": "{{ csrf_token }}" },
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error("Network response was not ok");
+				}
+				return response.json();
+			})
+			.then((data) => {
+				// Reset button state
+				submitBtn.innerHTML = "Next";
+				submitBtn.disabled = false;
+				isSubmitting = false;
+
+				if (data.status === "success") {
+					document.getElementById("question-text").textContent =
+						data.text;
+					document.getElementById(
+						"question-area"
+					).dataset.questionId = data.question_id;
+
+					if (data.has_image) {
+						document.getElementById("question-image").src =
+							data.image_url;
+						document.getElementById(
+							"question-image"
+						).style.display = "block";
+					} else {
+						document.getElementById(
+							"question-image"
+						).style.display = "none";
+					}
+
+					document.getElementById(
+						"progress"
+					).textContent = `Question ${data.current_index + 1} of ${
+						data.total_questions
+					}`;
+					timeRemaining = data.time_remaining;
+					currentIndex = data.current_index;
+					updateProgressBar();
+
+					const optionsContainer =
+						document.getElementById("options-container");
+					optionsContainer.innerHTML = "";
+
+					if (Object.keys(data.options).length > 0) {
+						for (const [key, value] of Object.entries(
+							data.options
+						)) {
+							const optionHtml =
+								data.option_images && data.option_images[key]
+									? `<img src="${data.option_images[key]}" class="img-fluid" style="max-height: 100px;">`
+									: `<span>${value}</span>`;
+
+							// Create custom styled options with hidden radio buttons
+							optionsContainer.innerHTML += `
+                            <div class="col-6 mb-3">
+                                <input type="radio" name="answer" id="option${key}" value="${key}" class="option-input">
+                                <label for="option${key}" class="option-label p-3 rounded text-center d-flex align-items-center justify-content-center" style="height: 100%; cursor: pointer; background-color: #333; color: white; transition: all 0.2s; border: 2px solid transparent;">
+                                    ${optionHtml}
+                                </label>
+                            </div>`;
+						}
+					} else {
+						optionsContainer.innerHTML = `
+                        <div class="col-12 p-2">
+                            <input type="text" name="answer" id="text-answer" class="form-control p-3" 
+                            style="background-color: #333; border: none; color: white;" 
+                            placeholder="Type your answer here">
+                        </div>`;
+					}
+
+					return data;
+				} else if (
+					data.status === "time_up" ||
+					data.status === "completed"
+				) {
+					// Pause timer before showing review dialog
+					isPaused = true;
+
+					// Show review dialog instead of redirecting immediately
+					showReviewDialog();
+					return data;
+				}
+			})
+			.catch((error) => {
+				console.error("Error:", error);
+				isSubmitting = false;
+				submitBtn.innerHTML = "Next";
+				submitBtn.disabled = false;
+				throw error; // Re-throw to allow handling in calling function
+			});
+	}
+
+	// Event Listeners
+	document
+		.getElementById("answer-form")
+		.addEventListener("submit", async (e) => {
+			e.preventDefault();
+
+			if (isSubmitting) return; // Prevent multiple submissions
+
+			try {
+				if (currentIndex < totalQuestions) {
+					// Submit current answer
+					await fetchQuestion(currentIndex, true);
+					currentIndex++;
+
+					if (currentIndex < totalQuestions) {
+						// Fetch next question
+						await fetchQuestion(currentIndex);
+					} else {
+						// This was the last question, mark session as completed
+						// We make one final submission to mark the session as completed
+						await fetchQuestion(currentIndex, true);
+
+						// Pause timer and show review dialog
+						isPaused = true;
+						showReviewDialog();
+					}
+				}
+			} catch (error) {
+				console.error("Error in submission process:", error);
+			}
+		});
+
+	document.getElementById("prev-btn").addEventListener("click", async () => {
+		// Go to previous question if available
+		if (currentIndex > 0 && !isSubmitting) {
+			currentIndex--;
+			try {
+				// Set a flag to indicate we're navigating backwards, not submitting a new test
+				await fetchQuestion(currentIndex, false);
+			} catch (error) {
+				console.error("Error going to previous question:", error);
+			}
+		}
+	});
+
+	document.getElementById("skip-btn").addEventListener("click", async () => {
+		// Skip current question without submission
+		if (!isSubmitting) {
+			// Store the current question index
+			const prevIndex = currentIndex;
+			currentIndex++;
+
+			try {
+				// Check if this is the last question and show dialog if so
+				if (currentIndex >= totalQuestions) {
+					// Show review dialog if we've reached the end
+					showReviewDialog();
+				} else {
+					// Otherwise fetch the next question
+					await fetchQuestion(currentIndex);
+				}
+			} catch (error) {
+				console.error("Error skipping question:", error);
+				// Restore the index on error
+				currentIndex = prevIndex;
+			}
+		}
+	});
+
+	// Initial load and timer setup
+	document.addEventListener("DOMContentLoaded", function () {
+		fetchQuestion(currentIndex);
+		timer = setInterval(updateTimer, 1000);
+
+		// Delegate event listener for option selection
+		document
+			.getElementById("options-container")
+			.addEventListener("click", function (e) {
+				const label = e.target.closest(".option-label");
+				if (label) {
+					const input = document.getElementById(
+						label.getAttribute("for")
+					);
+					if (input) {
+						input.checked = true;
+
+						// Reset all labels
+						document
+							.querySelectorAll(".option-label")
+							.forEach((l) => {
+								l.style.backgroundColor = "#333";
+								l.style.borderColor = "transparent";
+							});
+
+						// Highlight selected label
+						label.style.backgroundColor = "#3a3a3a";
+						label.style.borderColor = "#4d5eff";
+					}
+				}
+			});
+	});
+</script>
+
+{% endblock %}

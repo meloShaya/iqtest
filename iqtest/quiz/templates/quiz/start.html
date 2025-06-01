@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Take test{% endblock %}
+
+
+{% block content %}
+<div class="test-intro-container">
+  <div class="intro-icon">
+    <i class="fas fa-brain"></i>
+  </div>
+  <h3 class="test-intro-header">Are you ready to test your IQ?</h3>
+  
+  <div class="timer-info">
+    <i class="fas fa-clock timer-icon"></i>
+    <span class="timer-text">Recommended time: 45 seconds per question</span>
+  </div>
+  
+  <div class="instruction-list">
+    <div class="instruction-item">
+      <div class="instruction-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <div class="instruction-text">
+        There are 25 questions with varying difficulty levels in this quiz.
+      </div>
+    </div>
+    
+    <div class="instruction-item">
+      <div class="instruction-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <div class="instruction-text">
+        Select the correct answer among the options. If not sure, make an educated guess.
+      </div>
+    </div>
+    
+    <div class="instruction-item">
+      <div class="instruction-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <div class="instruction-text">
+        You can skip a question and come back to it later.
+      </div>
+    </div>
+    
+    <div class="instruction-item">
+      <div class="instruction-icon">
+        <i class="fas fa-check"></i>
+      </div>
+      <div class="instruction-text">
+        You're advised not to spend more than 45 seconds on a question.
+      </div>
+    </div>
+  </div>
+  
+  <a href="{% url 'take_test' %}" class="start-test-btn">
+    <i class="fas fa-play-circle"></i> Start Test
+  </a>
+</div>
+{% endblock %}

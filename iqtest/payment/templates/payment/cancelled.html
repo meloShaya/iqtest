@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block title %}Payment Canceled{% endblock %}
+{% block content %}
+    <h2>Payment Canceled</h2>
+    <p>Your payment for Session {{ test_session.id }} was canceled.</p>
+    <p><a href="{% url 'payment:process' session_id=test_session.id %}" class="btn btn-warning">Try Again</a></p>
+{% endblock %}

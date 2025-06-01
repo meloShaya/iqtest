@@ -1,0 +1,334 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}IQ Forge - Discover Your True Potential{% endblock %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 hero-content">
+                {% if message %}
+                    <div class="alert alert-info">{{ message }}</div>
+                {% endif %}
+                <h1 class="hero-title">Discover Your True <span class="iq-score">IQ Score</span></h1>
+                <p class="hero-subtitle">Measure your mental capabilities using our research-backed intellect assessment in a quick 5-minute session</p>
+                <div class="hero-buttons">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'start' %}" class="btn btn-primary btn-lg">Start Test Now</a>
+                        <a href="#how-it-works" class="btn btn-secondary btn-lg ml-3">Learn More</a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Start Test Now</a>
+                    <a href="#how-it-works" class="btn btn-secondary btn-lg ml-3">Learn More</a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-6 d-none d-lg-block">
+                <img src="{% static 'images/test_preview.png' %}" alt="IQ Test Preview" class="img-fluid hero-image">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features-section">
+    <div class="container">
+        <h2 class="section-title">5 Key Mental Abilities You Can Enhance</h2>
+        
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <h3 class="feature-title">Reaction</h3>
+                    <p>Fast response speed is crucial for daily activities and ensures our well-being. Consistent training with our assessment will improve your ability to react to triggers rapidly.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="feature-title">Retention</h3>
+                    <p>Need improved memory capacity? Our exercises will aid your comprehension and recall, enabling you to retain information swiftly and precisely.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-4 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3 class="feature-title">Concentration</h3>
+                    <p>If you frequently experience difficulty maintaining focus or struggle with attentiveness, our thoughtfully crafted exercises can assist in strengthening your concentration.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3 class="feature-title">Reasoning</h3>
+                    <p>Enhance problem-solving, analytical thinking, and logical deduction abilities with our mental exercises that refine your intellect and enable you to assess intricate scenarios and resolve issues effortlessly.</p>
+                </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <h3 class="feature-title">Speed</h3>
+                    <p>The capacity to process data rapidly translates to a more seamless understanding and comprehension of information, and an accelerated completion of tasks. Can you outpace your own time record?</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">97K+</div>
+                    <div class="stat-title">Tests Completed</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">104</div>
+                    <div class="stat-title">Average IQ Score</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">4.8/5</div>
+                    <div class="stat-title">User Rating</div>
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="stat-card">
+                    <div class="stat-number">9</div>
+                    <div class="stat-title">Countries Supported</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works" id="how-it-works">
+    <div class="container">
+        <h2 class="section-title">What's the Process?</h2>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h4>Complete the IQ Test</h4>
+                        <p>Undertake our research-based evaluation that assesses diverse facets of intellect, encompassing pattern identification, spatial perception, and analytical thinking.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h4>Obtain Your Detailed IQ Report</h4>
+                        <p>Acquire a thorough breakdown of your mental capabilities, featuring your overall IQ score and proficiency across distinct intellectual domains.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h4>Identify Aptitudes & Development Areas</h4>
+                        <p>Pinpoint your mental proficiencies and areas for possible improvement derived from your evaluation outcomes and cognitive breakdown.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                      <h4>Improve Through Customized Exercises</h4>
+                        <p>Gain access to individualized mental training activities crafted to strengthen particular cognitive functions based on your assessment findings.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+
+<section class="testimonials-section">
+  <div class="container">
+    <h2 class="section-title">What Our Users Say</h2>
+    
+    <div class="reviews-container">
+      {% for review in reviews %}
+        <div class="review-card">
+          <div class="review-header">
+            <div class="user-info">
+              <div class="avatar">{{ review.user.username|first|upper }}</div>
+              <h3 class="username">{{ review.user.username }}</h3>
+            </div>
+            <div class="rating">
+              {% for i in "12345" %}
+                {% if forloop.counter <= review.rating %}
+                  <i class="fas fa-star"></i>
+                {% else %}
+                  <i class="far fa-star"></i>
+                {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          <div class="review-content">
+            <p>{{ review.comment }}</p>
+          </div>
+          <div class="review-footer">
+            <small>{{ review.created_at|date:"F j, Y" }}</small>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<style>
+ 
+</style>
+
+<!-- CTA Section -->
+<section class="cta-section">
+    <div class="container">
+        <h2 class="cta-title">Ready to Discover Your True IQ?</h2>
+        <p class="cta-subtitle">Become one of the many individuals who have maximized their mental capabilities via our research-validated intellectual assessment.</p>
+        <div>
+            {% if user.is_authenticated %}
+                <a href="{% url 'start' %}" class="btn btn-cta">Start Free Test</a>
+            {% else %}
+                <a href="{% url 'login' %}" class="btn btn-cta">Start Free Test</a>
+            {% endif %}
+            <a href="#" class="btn btn-cta btn-outline">Learn More</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+        
+        // Animation for elements when they come into view
+        const animateOnScroll = function() {
+            const elements = document.querySelectorAll('.feature-card, .stat-card, .step-card, .testimonial-card');
+            
+            elements.forEach(element => {
+                const position = element.getBoundingClientRect();
+                
+                // If element is in viewport
+                if(position.top < window.innerHeight && position.bottom >= 0) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        };
+        
+        // Set initial state for elements
+        const elementsToAnimate = document.querySelectorAll('.feature-card, .stat-card, .step-card, .testimonial-card');
+        elementsToAnimate.forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        });
+        
+        // Run animation on load and scroll
+        animateOnScroll();
+        window.addEventListener('scroll', animateOnScroll);
+        
+        // Counter animation for stats
+        const statNumbers = document.querySelectorAll('.stat-number');
+        let animated = false;
+        
+        const animateNumbers = function() {
+            const statsSection = document.querySelector('.stats-section');
+            const position = statsSection.getBoundingClientRect();
+            
+            if(position.top < window.innerHeight && position.bottom >= 0 && !animated) {
+                animated = true;
+                
+                statNumbers.forEach(number => {
+                    const targetValue = number.textContent;
+                    const isFloat = targetValue.includes('.');
+                    const hasPlus = targetValue.includes('+');
+                    const hasSlash = targetValue.includes('/');
+                    
+                    let finalValue;
+                    if (hasSlash) {
+                        const parts = targetValue.split('/');
+                        finalValue = parseFloat(parts[0]);
+                    } else {
+                        finalValue = parseFloat(targetValue.replace('+', ''));
+                    }
+                    
+                    let startValue = 0;
+                    const duration = 2000;
+                    const startTime = performance.now();
+                    
+                    const updateCounter = function(currentTime) {
+                        const elapsedTime = currentTime - startTime;
+                        const progress = Math.min(elapsedTime / duration, 1);
+                        
+                        let currentValue = Math.floor(progress * finalValue);
+                        
+                        if (isFloat && progress >= 1) {
+                            number.textContent = targetValue;
+                        } else if (hasPlus && progress >= 1) {
+                            number.textContent = currentValue + '+';
+                        } else if (hasSlash && progress >= 1) {
+                            number.textContent = targetValue;
+                        } else {
+                            number.textContent = currentValue;
+                        }
+                        
+                        if (progress < 1) {
+                            requestAnimationFrame(updateCounter);
+                        }
+                    };
+                    
+                    requestAnimationFrame(updateCounter);
+                });
+            }
+        };
+        
+        window.addEventListener('scroll', animateNumbers);
+        animateNumbers();
+    });
+</script>
+{% endblock %}
+</antArtifact>
+           

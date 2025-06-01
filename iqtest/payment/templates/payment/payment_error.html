@@ -1,0 +1,45 @@
+{% extends "base.html" %} {% load static %} 
+{% block title %}Payment Error{% endblock %} 
+{% block content %}
+<div class="container mt-5">
+	<div class="row justify-content-center">
+		<div class="col-md-8">
+			<div class="card">
+				<div class="card-header bg-danger text-white">
+					<h3 class="mb-0">Payment Error</h3>
+				</div>
+				<div class="card-body">
+					<div class="text-center mb-4">
+						<i
+							class="fas fa-exclamation-triangle fa-3x text-danger"
+						></i>
+					</div>
+
+					<div class="alert alert-danger">
+						<p class="lead">{{ error }}</p>
+						<p>
+							There was a problem processing your payment. Please
+							try again or contact support.
+						</p>
+					</div>
+
+					<div class="mt-4 d-grid gap-2">
+						<a
+							href="{% url 'payment:process' session_id=test_session.id %}"
+							class="btn btn-primary"
+						>
+							Try Again
+						</a>
+						<a
+							href="{% url 'dashboard' %}"
+							class="btn btn-outline-secondary"
+						>
+							Back to Dashboard
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

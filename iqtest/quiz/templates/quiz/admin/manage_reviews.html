@@ -1,0 +1,217 @@
+{% extends "base.html" %} {% load static %} {% block title %}Manage Reviews{%
+endblock %} {% block content %}
+<div class="container mt-5">
+	<h1 class="mb-4">Review Management</h1>
+
+	{% if messages %}
+	<div class="messages">
+		{% for message in messages %}
+		<div
+			class="alert alert-{% if message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show"
+			role="alert"
+		>
+			{{ message }}
+			<button
+				type="button"
+				class="btn-close"
+				data-bs-dismiss="alert"
+				aria-label="Close"
+			></button>
+		</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+
+	<div class="card">
+		<div class="card-header">
+			<ul class="nav nav-tabs card-header-tabs" id="reviewTabs">
+				<li class="nav-item">
+					<a
+						class="nav-link active"
+						data-bs-toggle="tab"
+						href="#pendingReviews"
+						>Pending Reviews</a
+					>
+				</li>
+				<li class="nav-item">
+					<a
+						class="nav-link"
+						data-bs-toggle="tab"
+						href="#approvedReviews"
+						>Approved Reviews</a
+					>
+				</li>
+			</ul>
+		</div>
+
+		<div class="card-body">
+			<div class="tab-content">
+				<div class="tab-pane fade show active" id="pendingReviews">
+					<h3>Pending Reviews</h3>
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>User</th>
+									<th>Rating</th>
+									<th>Comment</th>
+									<th>Date</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for review in reviews %} {% if not
+								review.proved %}
+								<tr>
+									<td>{{ review.user.username }}</td>
+									<td>
+										{% for i in "12345" %} {% if
+										forloop.counter <= review.rating %}
+										<i class="fas fa-star text-warning"></i>
+										{% else %}
+										<i class="far fa-star"></i>
+										{% endif %} {% endfor %}
+									</td>
+									<td>{{ review.comment }}</td>
+									<td>
+										{{ review.created_at|date:"M d, Y" }}
+									</td>
+									<td>
+										<div class="d-flex">
+											<form method="post" class="me-2">
+												{% csrf_token %}
+												<input
+													type="hidden"
+													name="review_id"
+													value="{{ review.id }}"
+												/>
+												<input
+													type="hidden"
+													name="action"
+													value="approve"
+												/>
+												<button
+													type="submit"
+													class="btn btn-sm btn-success"
+												>
+													Approve
+												</button>
+											</form>
+											<form method="post">
+												{% csrf_token %}
+												<input
+													type="hidden"
+													name="review_id"
+													value="{{ review.id }}"
+												/>
+												<input
+													type="hidden"
+													name="action"
+													value="reject"
+												/>
+												<button
+													type="submit"
+													class="btn btn-sm btn-danger"
+												>
+													Reject
+												</button>
+											</form>
+										</div>
+									</td>
+								</tr>
+								{% endif %} {% empty %}
+								<tr>
+									<td colspan="5" class="text-center">
+										No pending reviews to display.
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+				<div class="tab-pane fade" id="approvedReviews">
+					<h3>Approved Reviews</h3>
+					<div class="table-responsive">
+						<table class="table table-striped">
+							<thead>
+								<tr>
+									<th>User</th>
+									<th>Rating</th>
+									<th>Comment</th>
+									<th>Date</th>
+									<th>Actions</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for review in reviews %} {% if
+								review.approved %}
+								<tr>
+									<td>{{ review.user.username }}</td>
+									<td>
+										{% for i in "12345" %} {% if
+										forloop.counter <= review.rating %}
+										<i class="fas fa-star text-warning"></i>
+										{% else %}
+										<i class="far fa-star"></i>
+										{% endif %} {% endfor %}
+									</td>
+									<td>{{ review.comment }}</td>
+									<td>
+										{{ review.created_at|date:"M d, Y" }}
+									</td>
+									<td>
+										<form method="post">
+											{% csrf_token %}
+											<input
+												type="hidden"
+												name="review_id"
+												value="{{ review.id }}"
+											/>
+											<input
+												type="hidden"
+												name="action"
+												value="reject"
+											/>
+											<button
+												type="submit"
+												class="btn btn-sm btn-danger"
+											>
+												Delete
+											</button>
+										</form>
+									</td>
+								</tr>
+								{% endif %} {% empty %}
+								<tr>
+									<td colspan="5" class="text-center">
+										No approved reviews to display.
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		// Initialize Bootstrap tabs
+		const triggerTabList = [].slice.call(
+			document.querySelectorAll("#reviewTabs a")
+		);
+		triggerTabList.forEach(function (triggerEl) {
+			const tabTrigger = new bootstrap.Tab(triggerEl);
+			triggerEl.addEventListener("click", function (event) {
+				event.preventDefault();
+				tabTrigger.show();
+			});
+		});
+	});
+</script>
+{% endblock %}

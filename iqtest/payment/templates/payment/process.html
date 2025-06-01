@@ -1,0 +1,113 @@
+{% extends "base.html" %} {% load static %} {% block title %}Payment Process{%endblock %} {% block content %}
+<div class="payment-container">
+	<div class="payment-icon">
+		<i class="fas fa-lock"></i>
+	</div>
+
+	<h2 class="payment-header">Payment Required</h2>
+
+	{% if messages %}
+	<div class="messages">
+		{% for message in messages %}
+		<div
+			class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+			role="alert"
+		>
+			{{ message }}
+			<button
+				type="button"
+				class="btn-close"
+				data-bs-dismiss="alert"
+				aria-label="Close"
+			></button>
+		</div>
+		{% endfor %}
+	</div>
+	{% endif %}
+
+	<div class="payment-details">
+		<p class="session-info">Test Session #{{ test_session.id }}</p>
+		<div class="amount-display">
+			<span class="currency-symbol">$</span>{{ amount }}
+		</div>
+		<p>Access your test results instantly after payment</p>
+	</div>
+
+	<form
+		action="{% url 'payment:process' session_id=test_session.id %}"
+		method="post"
+	>
+		{% csrf_token %}
+		<div class="payment-options">
+			<h3>Select Payment Method</h3>
+			<div class="payment-method-selection">
+				<div class="form-check mb-3">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="payment_method"
+						id="stripe"
+						value="stripe"
+						checked
+					/>
+					<label class="form-check-label" for="stripe">
+						Credit/Debit Card (Stripe)
+					</label>
+					<div class="payment-methods">
+						<img
+							src="{% static 'images/visa.png' %}"
+							alt="Visa"
+							class="payment-method-icon"
+						/>
+						<img
+							src="{% static 'images/master-card-logo-01.jpg' %}"
+							alt="Mastercard"
+							class="payment-method-icon"
+						/>
+						<img
+							src="{% static 'images/American-Express-Logo.png' %}"
+							alt="American Express"
+							class="payment-method-icon"
+						/>
+						<img
+							src="{% static 'images/Discover-logo.png' %}"
+							alt="Discover"
+							class="payment-method-icon"
+						/>
+					</div>
+				</div>
+				<div class="form-check">
+					<input
+						class="form-check-input"
+						type="radio"
+						name="payment_method"
+						id="paynow"
+						value="paynow"
+					/>
+					<label class="form-check-label" for="paynow">
+						Mobile Money (EcoCash) via Paynow
+					</label>
+				</div>
+			</div>
+		</div>
+		<button type="submit" class="payment-btn">
+			<i class="fas fa-credit-card"></i> Continue to Payment
+		</button>
+	</form>
+
+	<div class="secured-by">
+		<span class="secured-by-text">Secured payment</span>
+		<div class="stripe-powered">
+			<img
+				src="{% static 'images/stripe.png' %}"
+				alt="Stripe"
+				class="stripe-logo"
+			/>
+		</div>
+	</div>
+
+	<div class="security-note">
+		<i class="fas fa-shield-alt"></i> Secure, encrypted payment processing
+	</div>
+</div>
+{% endblock %}

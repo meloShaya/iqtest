@@ -1,0 +1,54 @@
+{% extends "base.html" %} {% load static %} {% block title %}Certificate
+Generated{% endblock %} {% block content %}
+<div class="container my-5">
+	<div class="row justify-content-center">
+		<div class="col-md-8">
+			<div class="card shadow-lg border-0">
+				<div class="card-body text-center p-5">
+					<div class="mb-4">
+						<i
+							class="fas fa-award text-success"
+							style="font-size: 80px"
+						></i>
+					</div>
+
+					<h1 class="card-title mb-4">
+						Certificate Generated Successfully!
+					</h1>
+
+					<p class="card-text lead mb-4">
+						Your IQ certificate has been successfully generated and
+						is ready for download.
+					</p>
+
+					{% if certificate_path %}
+					<div class="mb-5">
+						<a
+							href="{{ certificate_path }}"
+							download
+							class="btn btn-success btn-lg px-5 py-3 shadow-sm"
+						>
+							<i class="fas fa-download mr-2"></i> Download Your
+							Certificate
+						</a>
+					</div>
+					{% endif %}
+
+					<div class="text-muted mt-4">
+						<p>
+							You can always access your certificate again from
+							your dashboard.
+						</p>
+						<a
+							href="{% url 'dashboard' %}"
+							class="btn btn-outline-primary mt-3"
+						>
+							<i class="fas fa-home mr-2"></i> Return to Dashboard
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

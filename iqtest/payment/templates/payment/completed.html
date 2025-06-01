@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Payment Completed{% endblock %}
+
+{% block content %}
+<div class="payment-success-container">
+    <div class="success-card">
+        <div class="success-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+        </div>
+        <h2 class="success-title">Payment Successful</h2>
+        <div class="payment-details">
+            <div class="amount-wrapper">
+                <span class="currency">$</span>
+                <span class="amount">0.53</span>
+            </div>
+            <p class="payment-message">Your payment to view your results was completed successfully.</p>
+        </div>
+        <a href="{% url 'dashboard' %}" class="dashboard-button">
+            Go to Dashboard
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+        </a>
+    </div>
+</div>
+
+    
+{% endblock %}

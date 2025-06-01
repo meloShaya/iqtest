@@ -1,0 +1,42 @@
+{% extends "base.html" %} {% load static %} {% block title %}Payment Pending{%
+endblock %} {% block content %}
+<div class="container mt-5">
+	<div class="row justify-content-center">
+		<div class="col-md-8">
+			<div class="card">
+				<div class="card-header bg-warning text-dark">
+					<h3 class="mb-0">Payment Pending</h3>
+				</div>
+				<div class="card-body">
+					<div class="text-center mb-4">
+						<i class="fas fa-spinner fa-spin fa-3x"></i>
+					</div>
+
+					<div class="alert alert-warning">
+						<p class="lead">{{ message }}</p>
+						<p>
+							If you've already completed the payment on your
+							phone, try checking the status again.
+						</p>
+					</div>
+
+					<div class="mt-4 d-grid gap-2">
+						<a
+							href="{% url 'payment:check_paynow_status' session_id=test_session.id %}"
+							class="btn btn-primary"
+						>
+							Check Again
+						</a>
+						<a
+							href="{% url 'dashboard' %}"
+							class="btn btn-outline-secondary"
+						>
+							Back to Dashboard
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends "base.html" %} {% load static %} {% block title %}Test Paynow
+Integration{% endblock %} {% block content %}
+<div class="container mt-4">
+	<h2>Paynow API Test Tool</h2>
+
+	{% if is_test_mode %}
+	<div class="alert alert-info">
+		<strong>Test Mode Active:</strong> Using Paynow test environment. For
+		test transactions, the phone number <code>{{ test_phone }}</code> will
+		be used automatically if you don't provide one.
+	</div>
+	{% endif %}
+
+	<div class="card">
+		<div class="card-header">Test Paynow Payment</div>
+		<div class="card-body">
+			<form method="POST" id="paymentForm">
+				{% csrf_token %}
+				<div class="form-group mb-3">
+					<label>Amount:</label>
+					<div class="form-control-plaintext">
+						<strong>$0.53</strong> (Fixed price for IQ test results)
+					</div>
+				</div>
+				<div class="form-group mb-3">
+					<label for="email">Email:</label>
+					{% if is_test_mode %}
+					<div class="form-control-plaintext">
+						<strong
+							>{{
+							merchant_email|default:"suchanamakomborero2@gmail.com"
+							}}</strong
+						>
+						(Merchant email required for test mode)
+					</div>
+					<input type="hidden" name="email" value="{{
+					merchant_email|default:"suchanamakomborero2@gmail.com" }}"
+					/> {% else %}
+					<input
+						type="email"
+						class="form-control"
+						id="email"
+						name="email"
+						value="test@example.com"
+					/>
+					{% endif %}
+				</div>
+				<div class="form-group mb-3">
+					<label for="phone">Phone Number (EcoCash):</label>
+					<input
+						type="text"
+						class="form-control"
+						id="phone"
+						name="phone"
+						placeholder="{% if is_test_mode %}{{ test_phone }} (will be used automatically){% else %}Enter phone number{% endif %}"
+					/>
+				</div>
+				<button type="submit" class="btn btn-primary">
+					Process Payment
+				</button>
+			</form>
+		</div>
+	</div>
+
+	<div class="card mt-4" id="resultCard" style="display: none">
+		<div class="card-header">Result</div>
+		<div class="card-body">
+			<pre id="resultOutput"></pre>
+		</div>
+	</div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const form = document.getElementById("paymentForm");
+		const resultCard = document.getElementById("resultCard");
+		const resultOutput = document.getElementById("resultOutput");
+
+		form.addEventListener("submit", function (e) {
+			e.preventDefault();
+
+			// Show loading indicator
+			resultCard.style.display = "block";
+			resultOutput.textContent = "Processing payment...";
+
+			// Submit form via AJAX
+			const formData = new FormData(form);
+
+			fetch(window.location.href, {
+				method: "POST",
+				body: formData,
+				headers: {
+					"X-Requested-With": "XMLHttpRequest",
+				},
+			})
+				.then((response) => response.text()) // Get response as text instead of JSON
+				.then((data) => {
+					resultOutput.textContent = data;
+					resultCard.style.display = "block";
+				})
+				.catch((error) => {
+					resultOutput.textContent = "Error: " + error;
+					resultCard.style.display = "block";
+				});
+		});
+	});
+</script>
+{% endblock %}
