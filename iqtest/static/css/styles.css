@@ -38,6 +38,9 @@ body {
 	background-color: #f8f9fa;
 	color: #333;
 	overflow-x: hidden;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
 }
 
 .navbar {
@@ -258,6 +261,7 @@ body {
 	color: var(--light-text);
 	padding: 3rem 0 2rem;
 	margin-top: 4rem;
+	flex-shrink: 0;
 }
 
 .footer-links a {
@@ -2642,4 +2646,78 @@ button[type="submit"]:active {
 		opacity: 1;
 		transform: translateY(0);
 	}
+}
+
+/* Sticky Footer Styles */
+html,
+body {
+	height: 100%;
+	margin: 0; /* Ensure no default margins interfere */
+}
+
+body {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh; /* Fallback for older browsers or if flex isn't fully applied */
+}
+
+.main-content-wrapper {
+	flex-grow: 1; /* This makes the wrapper take up all available space */
+	/* You might want to add some default padding here if needed, e.g., padding-bottom: 2rem; */
+}
+
+/* Optional: ensure footer doesn't shrink if content is very sparse */
+.footer {
+	flex-shrink: 0;
+}
+/* End Sticky Footer Styles */
+
+/* Dashboard Header Responsive Adjustments */
+@media (max-width: 767px) {
+	/* Adjust breakpoint as needed, 767px is typically for tablets and below */
+	.dashboard-header {
+		flex-wrap: wrap; /* Allow items to wrap to the next line */
+		justify-content: center; /* Center items when they wrap */
+		gap: 1rem; /* Add some space between items when they wrap */
+	}
+
+	.dashboard-header h1,
+	.dashboard-header p {
+		text-align: center; /* Center the title and welcome message */
+		width: 100%; /* Allow them to take full width if needed */
+		margin-bottom: 0.5rem; /* Adjust spacing */
+	}
+
+	.new-quiz-btn {
+		width: auto; /* Allow button to size based on content, or set a max-width */
+		padding: 0.75rem 1rem; /* Slightly adjust padding for smaller screens if needed */
+		font-size: 0.9rem; /* Slightly adjust font size for smaller screens if needed */
+		margin-top: 0.5rem; /* Add some margin if it wraps below the text */
+	}
+}
+
+/* Optional: More specific styling if the button is still too wide */
+@media (max-width: 480px) {
+	/* Example for very small screens */
+	.new-quiz-btn {
+		width: 100%; /* Make button full width on very small screens */
+		text-align: center;
+	}
+}
+
+/* Styles for take_test.html to prevent footer overlap */
+.test-navigation-bar {
+	position: sticky;
+	bottom: 0;
+	left: 0;
+	width: 100%; /* Ensure it spans the full viewport width */
+	z-index: 1030; /* Above normal content, below modals (Bootstrap modals are ~1050) */
+	/* background-color & box-shadow are currently inline, can be moved here if preferred */
+}
+
+.take-test-content-area {
+	/* This padding creates space for the sticky .test-navigation-bar at its bottom */
+	/* It pushes the content up so the last bit isn't hidden by the .test-navigation-bar. */
+	/* It also helps push content up so the main site footer (from base.html) doesn't overlap the .test-navigation-bar */
+	padding-bottom: 90px; /* Adjust this value based on the actual height of .test-navigation-bar + a little extra for footer clearance if needed */
 }

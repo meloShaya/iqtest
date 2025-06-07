@@ -1,5 +1,8 @@
 {% extends 'base.html' %} {% load static %} {% block content %}
-<div class="container-fluid h-100" style="background-color: #121212">
+<div
+	class="container-fluid h-100 take-test-content-area"
+	style="background-color: #121212"
+>
 	<div class="row h-100">
 		<!-- Question Area -->
 		<div
@@ -68,7 +71,7 @@
 
 	<!-- Navigation and Timer -->
 	<div
-		class="row p-3"
+		class="row p-3 test-navigation-bar"
 		style="
 			background-color: #1e1e1e;
 			box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.2);
@@ -117,7 +120,7 @@
 <script>
 	let currentIndex = 0;
 	let totalQuestions = parseInt("{{ total_questions|safe }}") || 10; // Total questions with fallback
-	let timeRemaining = 1200; // 20 minutes in seconds
+	let timeRemaining = 900; // 15 minutes in seconds
 	let sessionId = "{{ session_id }}";
 	let timer;
 	let isSubmitting = false; // Flag to prevent multiple submissions
@@ -338,10 +341,10 @@
 		submitBtn.style.padding = "10px 20px";
 		submitBtn.style.cursor = "pointer";
 		submitBtn.onclick = () => {
-			window.location.href =
-				"{% url 'payment:process' session_id=session_id %}";
 			// window.location.href =
-			// 	"{% url 'share_to_view' session_id=session_id %}";
+			//	"{% url 'payment:process' session_id=session_id %}";
+			window.location.href =
+			 	"{% url 'share_to_view' session_id=session_id %}";
 		};
 
 		buttonContainer.appendChild(submitBtn);

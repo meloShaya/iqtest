@@ -134,10 +134,10 @@ def take_test(request):
     session.questions.set(questions)
     session.save()
 
-    context = {"session_id": session.id, "total_questions": 5}
+    context = {"session_id": session.id, "total_questions": 20}
     return render(request, "quiz/take_test.html", context)
 
-def select_random_questions(num_questions=5):
+def select_random_questions(num_questions=20):
     """
     Select 25 random questions, prioritizing diversity across categories.
     """
@@ -168,7 +168,7 @@ def get_question(request):
     questions = list(session.questions.all())
 
     time_elapsed = (timezone.now() - session.start_time).total_seconds()
-    if time_elapsed > 60:
+    if time_elapsed > 900:
         session.is_completed = True
         session.end_time = timezone.now()
         session.save()
@@ -212,7 +212,7 @@ def get_question(request):
         "option_images": option_images,
         "current_index": current_index,
         "total_questions": len(questions),
-        "time_remaining": max(0, 60 - int(time_elapsed))
+        "time_remaining": max(0, 900 - int(time_elapsed))
     })
 
 
